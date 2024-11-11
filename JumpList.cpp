@@ -75,7 +75,12 @@ JumpList::JumpList(int size, const string* arr) {
 
 JumpList::~JumpList() {
 	// IMPLEMENT ME
-
+    // Node *tmp;
+    // while(this->head_ != nullptr) {
+    //     tmp = this->head_;
+    //     this->head_ = this->head_->next_;
+    //     delete tmp;
+    // }
 }
 
 
@@ -244,8 +249,12 @@ string JumpList::prettyPrint() const {
             cout << "Substring: " << sub_str << endl;
             if (std::find(jump_nodes.begin(), jump_nodes.end(), sub_str) != jump_nodes.end()) {
                 if (start_parse_pos != 0) {
-                    jumpnodes = jumpnodes.replace(start_parse_pos - 2, (end_parse_pos - start_parse_pos) + 1,"> " + sub_str + " ");
-                } else{
+                    if (sub_str.length() > 1) { // e.g. sub_str = aaaa
+                        jumpnodes = jumpnodes.replace(start_parse_pos - 1, (end_parse_pos - start_parse_pos) + 1,"> " + sub_str + " ");
+                    } else { // e.g sub_str = a
+                        jumpnodes = jumpnodes.replace(start_parse_pos - 2, (end_parse_pos - start_parse_pos) + 1,"> " + sub_str + " ");
+                    }
+                } else{ // first jumpnode does not need any space padding
                     jumpnodes = jumpnodes.replace(start_parse_pos, end_parse_pos - start_parse_pos, sub_str);
                 }
                 cout << "Replace successful" << endl;
@@ -280,46 +289,79 @@ string JumpList::prettyPrint() const {
     for (char c: jumpnodes) jumpgaps += " ";
 
     idx = 0;
-    cout << "result: " << result << endl;
-    cout << "jumpnodes: " << jumpnodes << endl;
+    cout << "result -> " << result << endl;
+    cout << "jumpnodes-> " << jumpnodes << endl;
     cout << "BUILDING JUMPGAPS" << endl;
     string gaps = "";
-    while (idx <= jumpnodes.length() - 1) {
-        cout << "idx at start of loop: " << idx << endl;
-        if (jumpnodes[idx] != '-' || jumpnodes[idx] != '>' || jumpnodes[idx] != ' ') {
-            int start_parse_pos = idx;
-            int end_parse_pos = 0;
-            while (jumpnodes[idx] != ' ')
-                idx++;
-            end_parse_pos = idx;
-            cout << "not terminated" << endl;
-            cout << "start_parse_pos: " << start_parse_pos << endl;
-            cout << "end_parse_pos: " << end_parse_pos << endl;
-            
-            string sub_str = jumpnodes.substr(start_parse_pos, end_parse_pos - start_parse_pos);
-            cout << "Substring: " << sub_str << endl;
-            if (std::find(jump_nodes.begin(), jump_nodes.end(), sub_str) != jump_nodes.end()) {
-                string gap = std::to_string(jumpMap[sub_str]);
-                
-                // if (start_parse_pos != 0) {
-                //     jumpgaps = jumpgaps.replace(start_parse_pos - 2, (end_parse_pos - start_parse_pos) + 1,"> " + sub_str + " ");
-                // } else{
-                //     jumpgaps = jumpgaps.replace(start_parse_pos, end_parse_pos - start_parse_pos, sub_str);
-                // }
-                cout << "Happens before a replace" << endl;
-                cout << "substring length: " << (start_parse_pos + (end_parse_pos - start_parse_pos)) << endl;
-                cout << "jumpnodes length: " << jumpnodes.length() << endl;
-                if ((start_parse_pos + (end_parse_pos - start_parse_pos)) >= jumpnodes.length()) {
-                    gaps = jumpgaps.replace(start_parse_pos, jumpnodes.length(), gap);
-                } else {
-                    gaps = jumpgaps.replace(start_parse_pos, end_parse_pos - start_parse_pos, gap);
+    if(jumpnodes.length() > 0){
+        while (idx <= jumpnodes.length() - 1) {
+            cout << "idx at start of loop: " << idx << endl;
+            if (jumpnodes[idx] != '-' || jumpnodes[idx] != '>' || jumpnodes[idx] != ' ') {
+                int start_parse_pos = idx;
+                int end_parse_pos = 0;
+                cout << "Inside Loop" << endl;
+
+                try
+                {
+                    /* code */
+                    cout << "Inside try catch" << endl;
+                    cout << idx << endl;
+                    cout << jumpnodes << endl;
+                    while (jumpnodes[idx] != ' ') {
+                        if (!jumpnodes[idx + 1]) {
+                            end_parse_pos = idx+1;
+                            break;
+                        }
+                        // cout << "Sub parse loop " << idx << endl;
+                        idx++;
+                    }
+
                 }
-                cout << "JumpGaps Replace successful" << endl;
+                catch(const std::exception& e)
+                {
+                    cout << "Catch comming in hot" << endl;
+                    std::cerr << e.what() << "Holy\n";
+                }
+        
+                end_parse_pos = idx;
+                cout << "not terminated" << endl;
+                cout << "start_parse_pos: " << start_parse_pos << endl;
+                cout << "end_parse_pos: " << end_parse_pos << endl;
+                
+                string sub_str = jumpnodes.substr(start_parse_pos, end_parse_pos - start_parse_pos);
+                cout << "Substring: " << sub_str << endl;
+                if (std::find(jump_nodes.begin(), jump_nodes.end(), sub_str) != jump_nodes.end()) {
+                    string gap = std::to_string(jumpMap[sub_str]);
+
+                    if (sub_str.length()>1) {
+                        for (int i = 1; i < sub_str.length(); i++) {
+                            gap += " ";
+                        }
+                    }
+                    
+                    // if (start_parse_pos != 0) {
+                    //     jumpgaps = jumpgaps.replace(start_parse_pos - 2, (end_parse_pos - start_parse_pos) + 1,"> " + sub_str + " ");
+                    // } else{
+                    //     jumpgaps = jumpgaps.replace(start_parse_pos, end_parse_pos - start_parse_pos, sub_str);
+                    // }
+                    cout << "Happens before a replace" << endl;
+                    cout << "substring length: " << (start_parse_pos + (end_parse_pos - start_parse_pos)) << endl;
+                    cout << "jumpnodes length: " << jumpnodes.length() << endl;
+                    if ((start_parse_pos + (end_parse_pos - start_parse_pos)) >= jumpnodes.length()) {
+                        gaps = jumpgaps.replace(start_parse_pos, jumpnodes.length(), gap);
+                    } else {
+                        gaps = jumpgaps.replace(start_parse_pos, end_parse_pos - start_parse_pos, gap);
+                    }
+                    cout << "JumpGaps Replace successful" << endl;
+                }
+                // continue;
             }
-            // continue;
+            // jumpnodes += "--";
+            idx++;
         }
-        // jumpnodes += "--";
-        idx++;
+    } else if(jumpnodes.length() == 1) {
+        gaps += std::to_string(jumpMap[std::to_string(jumpnodes[0])]);
+        cout << "GAP FOUND IN ONE ===>" << gaps << endl;
     }
 
     string output_width = "";
@@ -327,7 +369,7 @@ string JumpList::prettyPrint() const {
         output_width += "-";
     }
 
-    result = result + "\n" + jumpnodes + "\n" + jumpgaps;
+    result = result + "\n" + jumpnodes + "\n" + gaps;
 
 	return result; // dummy
 }
@@ -441,6 +483,10 @@ bool JumpList::erase(const string& s) {
 
     Node *delete_node = nullptr;
 
+    cout << "HEAD DATA is => " << head_->data_ << endl;
+    cout << "DATA TO REMOVE ==>" << s << endl;
+    cout << "IS THIS HEAD DATA?? " << (head_->data_ == s) << endl;
+
     // check the head
     if(head_->data_ == s) {
         cout << "Node is head node " << s << endl;
@@ -483,6 +529,7 @@ bool JumpList::erase(const string& s) {
     Node *tmp = head_;
     Node *prev_node = nullptr;
     cout << "so it is below" << endl;
+    this->print();
     while(tmp->jump_ != nullptr && tmp->jump_->data_ < s) {
         cout << "loop" << endl;
         tmp = tmp->jump_;
@@ -505,19 +552,20 @@ bool JumpList::erase(const string& s) {
             Node *new_jump_node = last_seen_jump_node; // will start count from last seen jump node
             if (last_seen_jump_node->gap_ + tmp->gap_ > MAX_GAP_SIZE) {
                 cout << "Jump segment merge to occur" << endl;
-                int mid_gap = last_seen_jump_node->gap_ + tmp->gap_;
-                int left_mid_gap = mid_gap % 2 == 0 ? mid_gap : mid_gap + 1;
+                int total_gap = last_seen_jump_node->gap_ + tmp->gap_;
+                int left_mid_gap = total_gap % 2 == 0 ? total_gap / 2 : (total_gap / 2) + 1;
+                int right_mid_gap = total_gap / 2;
                 cout << "Gap size: " << (last_seen_jump_node->gap_ + tmp->gap_) << endl;
                 cout << "last seen node gap: " << last_seen_jump_node->gap_ << endl;
                 cout << "tmp gap: " << tmp->gap_ << endl;
-                cout << "mid gap: " << mid_gap << endl;
+                // cout << "mid gap: " << mid_gap << endl;
 
-                for (int i = 0; i < mid_gap; i++) new_jump_node = new_jump_node->next_; // get to the new jump node
+                for (int i = 0; i < left_mid_gap; i++) new_jump_node = new_jump_node->next_; // get to the new jump node
                 cout << "past the iteration" << endl;
                 cout << "last seen jump node data: " << last_seen_jump_node->data_ << endl;
                 cout << "new jump node data: " << new_jump_node->data_ << endl;
-                new_jump_node->gap_ = mid_gap; new_jump_node->jump_ = tmp->jump_;
-                last_seen_jump_node->gap_ = mid_gap; last_seen_jump_node->jump_ = new_jump_node; // complete merge
+                new_jump_node->gap_ = right_mid_gap; new_jump_node->jump_ = tmp->jump_;
+                last_seen_jump_node->gap_ = left_mid_gap; last_seen_jump_node->jump_ = new_jump_node; // complete merge
                 cout << "past the segment merge" << endl;
                 prev_node->next_ = tmp->next_ != nullptr? tmp->next_: nullptr;
                 // delete tmp;
@@ -536,16 +584,26 @@ bool JumpList::erase(const string& s) {
                 cout << "returning - jump but no merge" << endl;
                 return true;
             }
-        } else {
+        } else { // No jump value on node, but gap value present
             cout << "should be here where there is no jump but we have a gap" << endl;
             // last_seen_jump_node++;  This caused something interesting 😅
             last_seen_jump_node->gap_++; // re-apply increment, we aren't decrementing the last seen anymore
 
             if (tmp->next_ != nullptr) { // if we aren't at the end of the JumpList
-                prev_node->next_ = tmp->next_;
-                tmp->next_->jump_ = tmp->jump_;
-                tmp->next_->gap_ = tmp->gap_; // decrement the gap since we're moving to the right by one shift;
-                tmp->next_->gap_--;
+                if ((last_seen_jump_node->gap_ + tmp->gap_) <= MAX_GAP_SIZE) { // if the cumulative gap is smaller than MAX SIZE
+                    cout << "UNFORTUNARE TEMP GAP IS ---<" << tmp->gap_ << endl;
+
+                    // last_seen_jump_node->gap_ += tmp->gap_;
+                    last_seen_jump_node->gap_++;
+                    prev_node->next_ = tmp->next_;
+                } else  {
+                        // ((last_seen_jump_node->gap_ + tmp->gap_) > MAX_GAP_SIZE)
+                        prev_node->next_ = tmp->next_;
+                        tmp->next_->jump_ = tmp->jump_;
+                        tmp->next_->gap_ = tmp->gap_; // decrement the gap since we're moving to the right by one shift;
+                        tmp->next_->gap_--;
+                }
+
             } else {
                 prev_node->next_ = nullptr;
             }
